@@ -5,13 +5,17 @@ const props = defineProps({
   card: {
     type: Object,
     required: true
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 
 const emit = defineEmits(['update'])
 
 const progress = computed(() => {
-  if (!props.card?.items.length) return 0
+  if (!props.card.items.length) return 0
   const checked = props.card.items.filter(i => i.completed).length
   return Math.round((checked / props.card.items.length) * 100)
 })
@@ -19,13 +23,13 @@ const progress = computed(() => {
 const emitUpdate = () => {
   emit('update', {
     ...props.card,
-    items: props.card?.items.map(i => ({ ...i }))
+    items: props.card.items.map(i => ({ ...i }))
   })
 }
 </script>
 
 <template>
-  <article class="card" :class="{ 'card-done': card.column === 3 }">
+  <div class="card" :class="{ 'card-done': card.column === 3 }">
     <h3>{{ card.title }}</h3>
 
     <div class="progress-container">
@@ -41,6 +45,7 @@ const emitUpdate = () => {
           <input
             type="checkbox"
             v-model="item.completed"
+            :disabled="disabled || card.column === 3"
             @change="emitUpdate"
           />
           <span>{{ item.text }}</span>
@@ -51,7 +56,7 @@ const emitUpdate = () => {
     <div v-if="card.completedAt" class="timestamp">
       Завершено: {{ card.completedAt }}
     </div>
-  </article>
+  </div>
 </template>
 
 <style scoped>

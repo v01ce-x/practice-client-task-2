@@ -17,6 +17,14 @@ const calculateProgress = (items) => {
   return (checked / items.length) * 100
 }
 
+const isColumnOneBlocked = computed(() => {
+  const col2Full = cardsCol2.value.length >= 5
+  const col1HasReadyToMove = cardsCol1.value.some(card => {
+    return calculateProgress(card.items) > 50
+  })
+  return col2Full && col1HasReadyToMove
+})
+
 const addNewItem = () => newCardItems.value.push('')
 const removeNewItem = (idx) => newCardItems.value.splice(idx, 1)
 
@@ -87,14 +95,19 @@ watch(cards, (newCards) => {
       </button>
     </header>
 
+    <div v-if="isColumnOneBlocked" class="alert-blocked">
+      ⛔ Второй столбец переполнен! Завершите задачу из второго столбца.
+    </div>
+
     <main class="board">
-      <section class="column">
+      <section class="column" :class="{ blocked: isColumnOneBlocked }">
         <h2>В работе <small>({{ cardsCol1.length }}/3)</small></h2>
         <div class="card-list">
           <NoteCard
             v-for="card in cardsCol1"
             :key="card.id"
             :card="card"
+            :disabled="isColumnOneBlocked"
             @update="handleUpdate"
           />
         </div>
@@ -164,6 +177,16 @@ header {
   align-items: center;
 }
 
+.alert-blocked {
+  background: #ff5630;
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: bold;
+}
+
 .board {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -176,6 +199,13 @@ header {
   padding: 15px;
   border-radius: 8px;
   min-height: 500px;
+}
+
+.column.blocked {
+  opacity: 0.5;
+  pointer-events: none;
+  border: 2px solid #ff5630;
+  background: #ffebe6;
 }
 
 .column h2 {
