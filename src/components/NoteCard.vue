@@ -15,7 +15,7 @@ const props = defineProps({
 const emit = defineEmits(['update'])
 
 const progress = computed(() => {
-  if (!props.card.items.length) return 0
+  if (!props.card?.items.length) return 0
   const checked = props.card.items.filter(i => i.completed).length
   return Math.round((checked / props.card.items.length) * 100)
 })
@@ -23,7 +23,7 @@ const progress = computed(() => {
 const emitUpdate = () => {
   emit('update', {
     ...props.card,
-    items: props.card.items.map(i => ({ ...i }))
+    items: props.card?.items.map(i => ({ ...i }))
   })
 }
 </script>
@@ -66,16 +66,29 @@ const emitUpdate = () => {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   margin-bottom: 15px;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .card-done {
   background: #e6fffa;
   border: 1px solid #b2f5ea;
+  opacity: 0.9;
 }
 
 h3 {
   margin: 0 0 10px 0;
   font-size: 1.1rem;
+  color: #333;
 }
 
 .progress-container {
@@ -96,13 +109,15 @@ h3 {
 .progress-fill {
   height: 100%;
   background: #0079bf;
-  transition: width 0.3s;
+  transition: width 0.3s ease;
 }
 
 .progress-text {
   font-size: 0.8rem;
   font-weight: bold;
   color: #0079bf;
+  min-width: 40px;
+  text-align: right;
 }
 
 .item-list {
@@ -115,6 +130,7 @@ h3 {
   margin-bottom: 8px;
   display: flex;
   align-items: center;
+  transition: all 0.2s ease;
 }
 
 .item-list li.completed span {
@@ -141,5 +157,10 @@ label {
 input[type="checkbox"] {
   transform: scale(1.2);
   cursor: pointer;
+}
+
+input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 </style>

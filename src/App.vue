@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import NoteCard from './components/NoteCard.vue'
+import NoteCard from '@/components/NoteCard.vue'
 
 const STORAGE_KEY = 'kanban-data'
 const cards = ref([])
@@ -11,6 +11,11 @@ const newCardItems = ref(['', '', ''])
 const cardsCol1 = computed(() => cards.value.filter(c => c.column === 1))
 const cardsCol2 = computed(() => cards.value.filter(c => c.column === 2))
 const cardsCol3 = computed(() => cards.value.filter(c => c.column === 3))
+
+const canCreate = computed(() => {
+  const validItems = newCardItems.value.filter(i => i.trim() !== '')
+  return newCardTitle.value.trim() !== '' && validItems.length >= 3
+})
 
 const calculateProgress = (items) => {
   if (!items || items.length === 0) return 0
@@ -156,7 +161,6 @@ onMounted(() => {
       </section>
     </main>
 
-    <!-- Модальное окно (как в коммите 4) -->
     <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
       <div class="modal">
         <h3>Создать карточку</h3>
@@ -175,7 +179,9 @@ onMounted(() => {
 
         <div class="modal-actions">
           <button @click="showModal = false">Отмена</button>
-          <button @click="createCard" class="btn-primary">Создать</button>
+          <button @click="createCard" :disabled="!canCreate" class="btn-primary">
+            Создать
+          </button>
         </div>
       </div>
     </div>
@@ -184,16 +190,24 @@ onMounted(() => {
 
 <style>
 #app {
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  background: #f0f2f5;
+  min-height: 100vh;
 }
 
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  margin: 0;
+  color: #172b4d;
 }
 
 .alert-blocked {
@@ -204,6 +218,13 @@ header {
   margin-bottom: 15px;
   text-align: center;
   font-weight: bold;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
 
 .board {
@@ -217,7 +238,8 @@ header {
   background: #ebecf0;
   padding: 15px;
   border-radius: 8px;
-  min-height: 500px;
+  min-height: 600px;
+  transition: all 0.3s ease;
 }
 
 .column.blocked {
@@ -231,6 +253,8 @@ header {
   font-size: 1rem;
   color: #5e6c84;
   margin-top: 0;
+  display: flex;
+  justify-content: space-between;
 }
 
 .card-list {
@@ -242,6 +266,13 @@ button {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-primary {
@@ -249,9 +280,14 @@ button {
   color: white;
 }
 
+.btn-primary:hover:not(:disabled) {
+  background: #026aa7;
+}
+
 .btn-secondary {
   background: #fff;
   border: 1px solid #ccc;
+  color: #333;
   width: 100%;
   margin-top: 5px;
 }
@@ -280,6 +316,13 @@ button {
   padding: 25px;
   border-radius: 8px;
   width: 400px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  animation: modalIn 0.3s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .input-field {
@@ -289,6 +332,10 @@ button {
   border: 1px solid #dfe1e6;
   border-radius: 4px;
   box-sizing: border-box;
+}
+
+.items-editor {
+  margin-bottom: 20px;
 }
 
 .item-row {
@@ -308,6 +355,5 @@ button {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 20px;
 }
 </style>
