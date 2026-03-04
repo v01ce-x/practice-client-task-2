@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import NoteCard from '@/components/NoteCard.vue'
+import NoteCard from './components/NoteCard.vue'
 
 const cards = ref([])
 const showModal = ref(false)
@@ -38,6 +38,13 @@ const createCard = () => {
   newCardTitle.value = ''
   newCardItems.value = ['', '', '']
 }
+
+const handleUpdate = (updatedCard) => {
+  const index = cards.value.findIndex(c => c.id === updatedCard.id)
+  if (index !== -1) {
+    cards.value[index] = updatedCard
+  }
+}
 </script>
 
 <template>
@@ -57,6 +64,7 @@ const createCard = () => {
             v-for="card in cardsCol1"
             :key="card.id"
             :card="card"
+            @update="handleUpdate"
           />
         </div>
       </section>
@@ -68,6 +76,7 @@ const createCard = () => {
             v-for="card in cardsCol2"
             :key="card.id"
             :card="card"
+            @update="handleUpdate"
           />
         </div>
       </section>
@@ -79,6 +88,7 @@ const createCard = () => {
             v-for="card in cardsCol3"
             :key="card.id"
             :card="card"
+            @update="handleUpdate"
           />
         </div>
       </section>
