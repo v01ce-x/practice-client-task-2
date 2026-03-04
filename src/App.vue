@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import NoteCard from './components/NoteCard.vue'
 
+const STORAGE_KEY = 'kanban-data'
 const cards = ref([])
 const showModal = ref(false)
 const newCardTitle = ref('')
@@ -84,6 +85,23 @@ watch(cards, (newCards) => {
     cards.value = [...newCards]
   }
 }, { deep: true })
+
+const saveData = () => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(cards.value))
+}
+
+watch(cards, saveData, { deep: true })
+
+onMounted(() => {
+  const saved = localStorage.getItem(STORAGE_KEY)
+  if (saved) {
+    try {
+      cards.value = JSON.parse(saved)
+    } catch (event) {
+      console.error('Ошибка загрузки данных', event)
+    }
+  }
+})
 </script>
 
 <template>
@@ -138,6 +156,7 @@ watch(cards, (newCards) => {
       </section>
     </main>
 
+    <!-- Модальное окно (как в коммите 4) -->
     <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
       <div class="modal">
         <h3>Создать карточку</h3>
