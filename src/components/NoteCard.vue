@@ -25,7 +25,7 @@ const emitUpdate = () => {
 </script>
 
 <template>
-  <div class="card" :class="{ 'card-done': card.column === 3 }">
+  <article class="card" :class="{ 'card-done': card.column === 3 }">
     <h3>{{ card.title }}</h3>
 
     <div class="progress-container">
@@ -51,7 +51,7 @@ const emitUpdate = () => {
     <div v-if="card.completedAt" class="timestamp">
       Завершено: {{ card.completedAt }}
     </div>
-  </div>
+  </article>
 </template>
 
 <style scoped>

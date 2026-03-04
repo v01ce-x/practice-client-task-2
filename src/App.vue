@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import NoteCard from './components/NoteCard.vue'
 
 const cards = ref([])
@@ -10,6 +10,12 @@ const newCardItems = ref(['', '', ''])
 const cardsCol1 = computed(() => cards.value.filter(c => c.column === 1))
 const cardsCol2 = computed(() => cards.value.filter(c => c.column === 2))
 const cardsCol3 = computed(() => cards.value.filter(c => c.column === 3))
+
+const calculateProgress = (items) => {
+  if (!items || items.length === 0) return 0
+  const checked = items.filter(i => i.completed).length
+  return (checked / items.length) * 100
+}
 
 const addNewItem = () => newCardItems.value.push('')
 const removeNewItem = (idx) => newCardItems.value.splice(idx, 1)
@@ -45,6 +51,31 @@ const handleUpdate = (updatedCard) => {
     cards.value[index] = updatedCard
   }
 }
+
+watch(cards, (newCards) => {
+  let hasChanges = false
+
+  newCards.forEach(card => {
+    const progress = calculateProgress(card.items)
+
+    if (progress > 50 && card.column === 1) {
+      if (cardsCol2.value.length < 5) {
+        card.column = 2
+        hasChanges = true
+      }
+    }
+
+    if (progress === 100 && card.column !== 3) {
+      card.column = 3
+      card.completedAt = new Date().toLocaleString()
+      hasChanges = true
+    }
+  })
+
+  if (hasChanges) {
+    cards.value = [...newCards]
+  }
+}, { deep: true })
 </script>
 
 <template>
