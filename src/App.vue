@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import NoteCard from '@/components/NoteCard.vue'
 
 const cards = ref([])
 const showModal = ref(false)
@@ -17,6 +18,10 @@ const createCard = () => {
   const validItems = newCardItems.value.filter(i => i.trim() !== '')
   if (validItems.length < 3) {
     alert('Минимум 3 пункта списка!')
+    return
+  }
+  if (cardsCol1.value.length >= 3) {
+    alert('В первом столбце максимум 3 карточки!')
     return
   }
 
@@ -47,17 +52,35 @@ const createCard = () => {
     <main class="board">
       <section class="column">
         <h2>В работе <small>({{ cardsCol1.length }}/3)</small></h2>
-        <div class="card-list"></div>
+        <div class="card-list">
+          <NoteCard
+            v-for="card in cardsCol1"
+            :key="card.id"
+            :card="card"
+          />
+        </div>
       </section>
 
       <section class="column">
         <h2>В процессе <small>({{ cardsCol2.length }}/5)</small></h2>
-        <div class="card-list"></div>
+        <div class="card-list">
+          <NoteCard
+            v-for="card in cardsCol2"
+            :key="card.id"
+            :card="card"
+          />
+        </div>
       </section>
 
       <section class="column">
         <h2>Готово</h2>
-        <div class="card-list"></div>
+        <div class="card-list">
+          <NoteCard
+            v-for="card in cardsCol3"
+            :key="card.id"
+            :card="card"
+          />
+        </div>
       </section>
     </main>
 
